@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+application-local.properties
+set-env.ps1
+how-to-run
+
 ### STS ###
 .apt_generated
 .classpath

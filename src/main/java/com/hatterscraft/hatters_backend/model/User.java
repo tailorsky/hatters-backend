@@ -2,92 +2,84 @@ package com.hatterscraft.hatters_backend.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(name = "users")
+@Table(name="users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(name="discord_id", unique=true, nullable=true)
+    private String discordId;
 
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
-    private String email;
-
-    private String name;
-    private String avatar;
+    @Column(name="minecraft_nickname", unique=true, nullable=true)
+    private String minecraftNickname;
+    @Column(name="uuid_minecraft", unique=true, nullable=true)
+    private String uuid;
+    @Column(name="minecraft_password_hash", nullable=true)
+    private String minecraftPasswordHash;
+    @Column(name="skin_url", unique=true, nullable=true)
+    private String skinUrl;
 
     @Column(nullable = false)
     private Integer balance = 0;
 
-    @ElementCollection
-    private List<String> inventory = new ArrayList<>();
+    @Column(name = "avatar_url", nullable = false)
+    private String avatarUrl;
 
-    private String telegram;
-    private String discord;
-    private String google;
-    private String minecraft;
+    private String username;
+    private String discriminator;
+    private String email;
+    private String avatar;
+    private String locale;
 
-    // Главное поле, чтобы фронт понимал, через какой провайдер логин
-    private String provider;
+    @Column(name = "first_login", nullable = false, updatable = false)
+    private LocalDateTime firstLogin;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private List<Item> inventory = new ArrayList<>();
 
-    // --- Геттеры и сеттеры ---
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // 🔹 Добавляем ManyToMany для ролей
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    @Column(name="play_time_seconds", nullable=false)
+    private Long playTimeSeconds = 0L; // количество секунд, которые игрок провёл на сервере
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    @Column(name="quests_completed", nullable=false)
+    private Integer questsCompleted = 0;
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public String getAvatar() { return avatar; }
-    public void setAvatar(String avatar) { this.avatar = avatar; }
-
-    public Integer getBalance() { return balance; }
-    public void setBalance(Integer balance) { this.balance = balance; }
-
-    public List<String> getInventory() { return inventory; }
-    public void setInventory(List<String> inventory) { this.inventory = inventory; }
-
-    public String getTelegram() { return telegram; }
-    public void setTelegram(String telegram) { this.telegram = telegram; }
-
-    public String getDiscord() { return discord; }
-    public void setDiscord(String discord) { this.discord = discord; }
-
-    public String getGoogle() { return google; }
-    public void setGoogle(String google) { this.google = google; }
-
-    public String getMinecraft() { return minecraft; }
-    public void setMinecraft(String minecraft) { this.minecraft = minecraft; }
-
-    public String getProvider() { return provider; }
-    public void setProvider(String provider) { this.provider = provider; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    @Column(name="level", nullable=false)
+    private Integer level = 0;
 }
