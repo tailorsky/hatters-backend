@@ -17,5 +17,5 @@ public interface EventRepository extends JpaRepository <Event, Long>{
     public List<Event> findTop3ByOrderByEventStartDesc();
 
     @Query("SELECT e FROM Event e WHERE e.eventStart <= :now AND e.eventEnd >= :now")
-    Optional<Event> findCurrentEvent(@Param("now") LocalDateTime now);
+    public List<Event> findCurrentEvent(@Param("now") LocalDateTime now);
 }

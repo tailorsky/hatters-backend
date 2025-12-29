@@ -19,24 +19,24 @@ public class PublicEventsController {
         this.eventRepository = eventRepository;
     }
 
-    @GetMapping("/public/events/current")
-    public EventDTO getCurrentEvent() {
+        @GetMapping("/public/events/current")
+        public List<EventDTO> getCurrentEvents() {
         LocalDateTime now = LocalDateTime.now();
-        Event currentEvent = eventRepository.findCurrentEvent(now).orElse(null);
+        List<Event> events = eventRepository.findCurrentEvent(now);
 
-        if (currentEvent == null) return null;
-
-        return new EventDTO(
-                currentEvent.getId(),
-                currentEvent.getTitle(),
-                currentEvent.getDescription(),
-                currentEvent.getVideoUrl(),
-                currentEvent.getImageUrl(),
-                currentEvent.getEventStart(),
-                currentEvent.getEventEnd(),
-                currentEvent.getRewards()
-        );
-    }
+        return events.stream()
+                .map(event -> new EventDTO(
+                        event.getId(),
+                        event.getTitle(),
+                        event.getDescription(),
+                        event.getVideoUrl(),
+                        event.getImageUrl(),
+                        event.getEventStart(),
+                        event.getEventEnd(),
+                        event.getRewards()
+                ))
+                .toList();
+        }
 
     @GetMapping("/public/events/past")
     public List<EventDTO> getPastEvents() {
